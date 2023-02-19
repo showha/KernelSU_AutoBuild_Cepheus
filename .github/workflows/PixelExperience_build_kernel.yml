@@ -58,11 +58,11 @@ jobs:
           sudo bash build.sh
 
           
-#       - name: release
-#         uses: "marvinpinto/action-automatic-releases@latest"
-#         with:
-#           automatic_release_tag: "${{ env.BUILD_TIME }}"
-#           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#           prerelease: false
-#           files: |
-#             kernel_workspace/android-kernel/out/*.zip
+      - name: release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          automatic_release_tag: "${{ env.BUILD_TIME }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            kernel_workspace/android-kernel/out/*.zip
