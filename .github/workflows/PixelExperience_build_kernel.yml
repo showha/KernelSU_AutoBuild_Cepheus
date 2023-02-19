@@ -1,7 +1,7 @@
 name: PixelExperience_build_kernel
 
 env:
-  KERNEL_SOURCE: 'https://github.com/PixelExperience-Devices/kernel_xiaomi_cepheus'
+  KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
   KERNEL_SOURCE_BRANCH: 'twelve-wip'
   KERNEL_DEFCONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'PixelExperience'
@@ -51,8 +51,6 @@ jobs:
       - name: build kernel
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          rm -f build.sh
-          cp $GITHUB_WORKSPACE/patch/build.sh $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           echo "BUILD_TIME=$(TZ=Asia/Shanghai date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
           rm .git -R
           sudo bash build.sh
