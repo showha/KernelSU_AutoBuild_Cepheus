@@ -2,7 +2,7 @@ name: PixelExperience_build_kernel
 
 env:
   KERNEL_SOURCE: 'https://github.com/PixelExperience-Devices/kernel_xiaomi_cepheus'
-  KERNEL_SOURCE_BRANCH: 'thirteen'
+  KERNEL_SOURCE_BRANCH: 'twelve-wip'
   KERNEL_DEFCONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'PixelExperience'
 
