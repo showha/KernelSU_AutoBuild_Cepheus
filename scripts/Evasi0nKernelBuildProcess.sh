@@ -33,7 +33,8 @@ sed -i '/supported.versions.*/d' anykernel.sh
 sed -i '/do.devicecheck.*/d' anykernel.sh
 
 sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${KERNEL_NAME}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
-
+sed -i '368a\extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);\n' input.c
+sed -i '374a\\tksu_handle_input_handle_event(&type, &code, &value);\n' input.c
 
 # echo build kernel
 # cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
