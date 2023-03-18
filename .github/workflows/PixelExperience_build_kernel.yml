@@ -1,65 +1,103 @@
-name: PixelExperience_build_kernel
+# name: PixelExperience_build_kernel
+
+# env:
+#   KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
+#   KERNEL_SOURCE_BRANCH: 'twelve'
+#   KERNEL_DEFCONFIG: 'cepheus_defconfig'
+#   KERNEL_NAME: 'PixelExperience'
+
+# on:
+# #   schedule:
+# #     - cron: '0 */4 * * *'
+#   workflow_dispatch:
+# jobs:
+#   build:
+#     runs-on: ubuntu-22.04
+#     steps:
+#       - uses: actions/checkout@v3
+      
+#       - name: download kernel source
+#         run: |
+#           cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
+#           git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
+          
+#       - name: kernel patch 
+#         run: |
+#           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          
+#           #rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
+#           #cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
+          
+#           sed -i '/supported.versions.*/d' anykernel.sh
+#           sed -i '/do.devicecheck.*/d' anykernel.sh
+          
+#           #sed -i 's/KERNEL_NAME=.*/KERNEL_NAME=${{ env.KERNEL_NAME}}-$DATE/g' build.sh
+#           #sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${{env.KERNEL_NAME}}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
+        
+        
+#       - name: add kernelsu 
+#         run: |
+#             cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+            
+#             echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
+#             echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
+#             echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
+            
+#             curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+            
+#             #git clone https://github.com/nozomanai/KernelSU.git
+#             #bash KernelSU/kernel/setup.sh
+            
+#       - name: build kernel
+#         run: |
+#           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+#           echo "BUILD_TIME=$(TZ=Asia/Shanghai date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
+#           rm .git -R
+#           sudo bash build.sh
+
+          
+#       - name: release
+#         uses: "marvinpinto/action-automatic-releases@latest"
+#         with:
+#           automatic_release_tag: "${{ env.BUILD_TIME }}"
+#           repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#           prerelease: false
+#           files: |
+#             kernel_workspace/android-kernel/out/*.zip
+
+
+name: crDroid_build_kernel
 
 env:
   KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
-  KERNEL_SOURCE_BRANCH: 'twelve-wip'
+  KERNEL_SOURCE_BRANCH: 'twelve'
   KERNEL_DEFCONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'PixelExperience'
-
+  
 on:
-#   schedule:
-#     - cron: '0 */4 * * *'
+  schedule:
+    - cron: '0 8 * * */3'
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       
-      - name: download kernel source
+      - name: run build script
         run: |
-          cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
-          git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
-          
-      - name: kernel patch 
-        run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          
-          rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
-          cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
-          
-          sed -i '/supported.versions.*/d' anykernel.sh
-          sed -i '/do.devicecheck.*/d' anykernel.sh
-          
-          #sed -i 's/KERNEL_NAME=.*/KERNEL_NAME=${{ env.KERNEL_NAME}}-$DATE/g' build.sh
-          #sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${{env.KERNEL_NAME}}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
-        
-        
-      - name: add kernelsu 
-        run: |
-            cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-            
-            echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-            echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-            echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-            
-            curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-            
-            #git clone https://github.com/nozomanai/KernelSU.git
-            #bash KernelSU/kernel/setup.sh
-            
-      - name: build kernel
-        run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           echo "BUILD_TIME=$(TZ=Asia/Shanghai date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
-          rm .git -R
-          sudo bash build.sh
-
+          bash scripts/Evasi0nKernelBuildProcess.sh ${{env.KERNEL_SOURCE}} ${{env.KERNEL_SOURCE_BRANCH}} ${{env.KERNEL_DEFCONFIG}} ${{env.KERNEL_NAME}} 
+      
+      - name: do build
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          sudo bash build.sh   
           
       - name: release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          automatic_release_tag: "${{ env.BUILD_TIME }}"
+          automatic_release_tag: "${{env.KERNEL_NAME}}-${{env.BUILD_TIME}}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
