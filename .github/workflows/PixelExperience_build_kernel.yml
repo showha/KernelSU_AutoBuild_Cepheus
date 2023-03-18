@@ -1,4 +1,4 @@
-# name: PixelExperience_build_kernel
+name: PixelExperience_build_kernel
 
 # env:
 #   KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
@@ -64,9 +64,6 @@
 #           prerelease: false
 #           files: |
 #             kernel_workspace/android-kernel/out/*.zip
-
-
-name: crDroid_build_kernel
 
 env:
   KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
