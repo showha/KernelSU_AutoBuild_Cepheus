@@ -4,13 +4,13 @@
 由于kernel的更新，将来可能会编译失败。
 
 支持小米9 ROM:
-- crDroid 
-- PixelExperience  
-- EvolutionX 
-- PixelOS
-
-所有内核均为安卓13版本
-
+- crDroid 9.2
+- PixelExperience  12.1
+- ~~~EvolutionX~~~
+- ~~~PixelOS~~~
+感谢@nozomanai提供的编译模板
+支持crDroid A13和PixelExperiencePlus A12
+所有内核均已加入安全启动模式（开机第一屏三击音量键）
 
 ```
 source：
