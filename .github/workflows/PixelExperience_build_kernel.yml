@@ -66,6 +66,8 @@ env:
 #             kernel_workspace/android-kernel/out/*.zip
 
 on:
+  schedule:
+    - cron: '0 8 * * */5'
   workflow_dispatch:
 jobs:
   build:
@@ -104,6 +106,10 @@ jobs:
           
           sed -i '151i\extern int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags);\n' fs/stat.c
           sed -i '175i\ksu_handle_stat(&dfd, &filename, &flags);\n' fs/stat.c
+          
+          # add the support for security-boot mode
+          sed -i '369i\extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);\n' drivers/input/input.c
+          sed -i '375i\ksu_handle_input_handle_event(&type, &code, &value);\n' drivers/input/input.c
       
       - name: build kernel
         run: |
