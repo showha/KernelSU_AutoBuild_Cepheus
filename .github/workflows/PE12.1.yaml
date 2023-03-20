@@ -1,4 +1,4 @@
-name: Build Kernel
+name: PE12.1_Kernel
 on:
   watch:
     types: [started]
