@@ -1,60 +1,71 @@
-# This is a basic workflow to help you get started with Actions
+name: PixelExperience_build_kernel
 
-name: buildTest
-# Controls when the workflow will run
+env:
+  KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
+  KERNEL_SOURCE_BRANCH: 'lts'
+  KERNEL_DEFCONFIG: 'cepheus_defconfig'
+  KERNEL_NAME: 'PixelExperience'
+
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+  schedule:
+    - cron: '0 16 * * */5'
   workflow_dispatch:
-    inputs:
-      KERNEL_SOURCE: 
-        description: 'Kernel Source'
-        required: true
-        default: 'https://github.com/crdroidandroid/android_kernel_xiaomi_cepheus'
-        
-      KERNEL_SOURCE_BRANCH:
-        description: 'Branch'
-        required: true
-        default: '13.0'
-      
-      KERNEL_DEFCONFIG:
-        description: 'Defconfig'
-        required: true
-        default: 'cepheus_defconfig'
-      
-      KERNEL_NAME:
-        required: false
-        default: 'crDroid'
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
-  
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: ubuntu-20.04
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      - name: T1
+      - name: download kernel source
         run: |
           cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
-          git clone https://github.com/nozomanai/KernelSU_AutoBuild_Cepheus android-kernel --depth=1
-          #cd $GITHUB_WORKSPACE
-          ls -l
-          pwd
+          git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
+      
+      - name: kernel patch
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+
+          rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
+          cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
+          
+          sed -i '/supported.versions.*/d' anykernel.sh
+          sed -i '/do.devicecheck.*/d' anykernel.sh
+      - name: add kernelsu
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+          
+          sed -i '1720i\extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv, void *envp, int *flags);\n' fs/exec.c
+          sed -i '1732i\ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);\n' fs/exec.c
+
+          sed -i '362i\extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode, int *flags);\n' fs/open.c
+          sed -i '366i\ksu_handle_faccessat(&dfd, &filename, &mode, NULL);\n' fs/open.c
+
+          sed -i '432i\extern int ksu_handle_vfs_read(struct file **file_ptr, char __user **buf_ptr, size_t *count_ptr, loff_t **pos);\n' fs/read_write.c
+          sed -i '438i\ksu_handle_vfs_read(&file, &buf, &count, &pos);\n' fs/read_write.c
+          
+          sed -i '151i\extern int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags);\n' fs/stat.c
+          sed -i '175i\ksu_handle_stat(&dfd, &filename, &flags);\n' fs/stat.c
+          
+          # add the support for security-boot mode
+          sed -i '369i\extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);\n' drivers/input/input.c
+          sed -i '375i\ksu_handle_input_handle_event(&type, &code, &value);\n' drivers/input/input.c
+      
+      - name: build kernel
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          echo "BUILD_TIME=$(TZ=Asia/Shanghai date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
+          sed -i 's/KERNEL_NAME=.*/KERNEL_NAME=${{ env.KERNEL_NAME}}-$DATE/g' build.sh
+          # sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${{env.KERNEL_NAME}}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
+          rm .git -R
+          sudo bash build.sh
+      
       - name: release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          automatic_release_tag: "last"
+          automatic_release_tag: "${{env.KERNEL_NAME}}-${{env.BUILD_TIME}}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
-            kernel_workspace/android-kernel/*.md
+            kernel_workspace/android-kernel/out/*.zip
