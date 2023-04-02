@@ -2,7 +2,7 @@ name: newPixelExperience_build_kernel
 
 env:
   KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
-  KERNEL_SOURCE_BRANCH: 'lts'
+  KERNEL_SOURCE_BRANCH: 'twelve'
   KERNEL_DEFCONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'newPixelExperience'
 
