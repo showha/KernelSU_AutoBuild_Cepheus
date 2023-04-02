@@ -1,4 +1,4 @@
-name: PixelExperience_build_kernel
+name: newPixelExperience_build_kernel
 
 env:
   KERNEL_SOURCE: 'https://github.com/showha/kernel_xiaomi_cepheus'
