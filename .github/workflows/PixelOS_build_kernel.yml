@@ -43,6 +43,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           rm .git -R
+          rm -f build.sh
+          cp $GITHUB_WORKSPACE/patch/build.sh ..
           sudo bash build.sh
           echo "BUILD_TIME=$(TZ=Asia/Shanghai date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
           
