@@ -81,7 +81,7 @@ echo -e "${restore}"
 BASE_AK_VER="REVUELTO-MI9-"
 DATE=`date +"%Y%m%d-%H%M"`
 AK_VER="$BASE_AK_VER$VER"
-ZIP_NAME="$AK_VER"-"$DATE"
+# ZIP_NAME="$AK_VER"-"$DATE"
 #export LOCALVERSION=~`echo $AK_VER`
 #export LOCALVERSION=~`echo $AK_VER`
 export ARCH=arm64
@@ -107,7 +107,8 @@ DATE_END=$(date +"%s")
 DIFF=$(($DATE_END - $DATE_START))
 
 echo
-find $ZIP_MOVE -type f -mmin -5 -mmin +0
+# find $ZIP_MOVE -type f -mmin -5 -mmin +0
+find $KERNEL_NAME -type f -mmin -5 -mmin +0
 
 echo
 echo -e "${green}"
