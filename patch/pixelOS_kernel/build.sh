@@ -19,7 +19,7 @@ KERNEL_NAME=PxielOS-cepheus-"$DATE"
 # DEFCONFIG="cepheus_defconfig"
 
 # # Download Clang
-# git clone https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 $CLANG_PATH
+# git clone https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 15 $CLANG_PATH
 
 # # Kernel Details
 # VER=""
@@ -148,8 +148,8 @@ rm -rf $KERNEL_PATH/out/ *.zip
 make mrproper
 
 echo "=========================Build========================="
-make O=out cepheus_defconfig
-make O=out | tee out/kernel.log
+make O=out LLVM_IAS=1 cepheus_defconfig
+make O=out LLVM_IAS=1 -j$(grep -c ^processor /proc/cpuinfo)
 
 if [ ! -e $KERNEL_PATH/out/arch/arm64/boot/Image.gz-dtb ]; then
     echo "=======================FAILED!!!======================="
