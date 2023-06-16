@@ -138,7 +138,7 @@ export SUBARCH=arm64
 
 echo "===================Setup Environment==================="
 # git clone --depth=1 https://gitlab.com/jjpprrrr/prelude-clang.git $CLANG_PATH
-git clone https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 $CLANG_PATH
+git clone https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 15 $CLANG_PATH
 git clone https://github.com/osm0sis/AnyKernel3 $ANYKERNEL_PATH
 sh -c "$(curl -sSL https://github.com/akhilnarang/scripts/raw/master/setup/android_build_env.sh/)"
 
