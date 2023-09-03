@@ -126,16 +126,23 @@ jobs:
       - name: Make Anykernel3
         # if: env.CHECK_FILE_IS_OK == 'true'
         run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace
-          cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} Anykernel/
-          rm -rf Anykernel/anykernel.sh
-          cp $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh Anykernel/
-          rm -rf Anykernel/.git* Anykernel/README.md
+          rm -r $ANYKERNEL_PATH/modules $ANYKERNEL_PATH/patch $ANYKERNEL_PATH/ramdisk
+          cp $KERNEL_PATH/anykernel.sh $ANYKERNEL_PATH/
+          cp $KERNEL_PATH/out/arch/arm64/boot/Image.gz-dtb $ANYKERNEL_PATH/
+          cd $ANYKERNEL_PATH
+          zip -r $KERNEL_NAME *
+          mv $KERNEL_NAME.zip $KERNEL_PATH/out/
+          cd $KERNEL_PATH
+          #rm -rf $CLANG_PATH
+          rm -rf $ANYKERNEL_PATH
+          echo $KERNEL_NAME.zip
 
       - name: Upload AnyKernel3
-        if: env.CHECK_FILE_IS_OK == 'true'
-        uses: actions/upload-artifact@v3
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: ${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-          path: kernel_workspace/anykernel/*
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: ${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+          files: |
+            $KERNEL_PATH/out/$KERNEL_NAME.zip
 
