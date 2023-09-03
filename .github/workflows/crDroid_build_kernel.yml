@@ -37,6 +37,8 @@ jobs:
           echo "delete yaml scrpit"
           rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
           cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
+          echo "CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_GZIP=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+          echo "CONFIG_FB_CFB_IMAGEBLIT=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_DEFCONFIG }}
           
       - name: Startup KernelSU
         run: |
