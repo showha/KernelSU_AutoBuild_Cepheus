@@ -5,8 +5,9 @@ env:
   KERNEL_SOURCE:  'https://github.com/raystef66/android_kernel_xiaomi_cepheus'
   KERNEL_SOURCE_BRANCH:  '12.1-cepheus'
   # KERNEL_SOURCE_BRANCH: '13.0'
-  KERNEL_DEFCONFIG: 'cepheus_defconfig'
+  KERNEL_CONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'crDroid-cepheus'
+  ARCH:  'arm64'
   
 on:
   schedule:
@@ -24,6 +25,8 @@ jobs:
           git clone https://github.com/raystef66/android_kernel_xiaomi_cepheus -b 12.1-cepheus android-kernel --depth=1
           rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
           cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
+          sed -i '/supported.versions.*/d' anykernel.sh
+          sed -i '/do.devicecheck.*/d' anykernel.sh
 
       - name: Setup KernelSU
         run: |
@@ -34,24 +37,9 @@ jobs:
       - name: Setup Configuration for Kernel
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          if [ ${{ env.ADD_KPROBES_CONFIG }} = true ]; then
-              echo "CONFIG_MODULES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-              echo "CONFIG_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-              echo "CONFIG_HAVE_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-              echo "CONFIG_KPROBE_EVENTS=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          fi
-          if [ ${{ env.ADD_OVERLAYFS_CONFIG }} = true ]; then
-              echo "CONFIG_OVERLAY_FS=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          fi
-          if [ ${{ env.DISABLE-LTO }} = true ]; then
-              sed -i 's/CONFIG_LTO=y/CONFIG_LTO=n/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-              sed -i 's/CONFIG_LTO_CLANG=y/CONFIG_LTO_CLANG=n/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-              sed -i 's/CONFIG_THINLTO=y/CONFIG_THINLTO=n/' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-              echo "CONFIG_LTO_NONE=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          fi
-          if [ ${{ env.DISABLE_CC_WERROR }} = true ]; then
-              echo "CONFIG_CC_WERROR=n" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          fi
+          ehco "CONFIG_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+          ehco "CONFIG_HAVE_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+          ehco "CONFIG_KPROBE_EVENTS=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
       
       - name: do build
         run: |
