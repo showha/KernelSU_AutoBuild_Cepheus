@@ -112,17 +112,17 @@ jobs:
       #     # make O=out clean mrproper CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ ${KERNEL_DEFCONFIG}
       #     # make O=out CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ -j$(nproc --all)
 
-      - name: Check a kernel output files
-        run: |
-         cd $GITHUB_WORKSPACE/kernel_workspace
-         if [ -f android-kernel/out/arch/amr64/boot/${{ env.KERNEL_FILE }} ]; then
-             echo "CHECK_FILE_IS_OK=true" >> $GITHUB_ENV
-         else
-             echo "Kernel output file is empty"
-         fi
+      # - name: Check a kernel output files
+      #   run: |
+      #    cd $GITHUB_WORKSPACE/kernel_workspace
+      #    if [ -f android-kernel/out/arch/amr64/boot/${{ env.KERNEL_FILE }} ]; then
+      #        echo "CHECK_FILE_IS_OK=true" >> $GITHUB_ENV
+      #    else
+      #        echo "Kernel output file is empty"
+      #    fi
 
       - name: Make Anykernel3
-        if: env.CHECK_FILE_IS_OK == 'true'
+        # if: env.CHECK_FILE_IS_OK == 'true'
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
           git clone https://github.com/osm0sis/AnyKernel3
