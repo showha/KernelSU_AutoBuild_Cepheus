@@ -6,6 +6,7 @@ env:
   KERNEL_CONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'crDroid-cepheus'
   ARCH:  'arm64'
+  KERNEL_FILE:  'Image.gz-dtb'
   
 on:
   schedule:
@@ -24,7 +25,7 @@ jobs:
           echo "kernel defconfig : ${{env.KERNEL_DEFCONFIG}}"
           echo "kernel name : ${{env.KERNEL_NAME}}"
           sudo apt-get update
-          sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3
+
       - name: Download Kernel Source
         run: |
           echo "download kernel source"
@@ -41,9 +42,9 @@ jobs:
         run: |
           echo "add kernelsu"
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{env.KERNEL_DEFCONFIG}}
-          echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{env.KERNEL_DEFCONFIG}}
-          echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{env.KERNEL_DEFCONFIG}}
+          echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{env.KERNEL_CONFIG}}
+          echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{env.KERNEL_CONFIG}}
+          echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{env.KERNEL_CONFIG}}
           
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
           
@@ -88,12 +89,29 @@ jobs:
       #     # make O=out clean mrproper CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ ${KERNEL_DEFCONFIG}
       #     # make O=out CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ -j$(nproc --all)
 
-      - name: release
-        uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Check a kernel output files
+        run: |
+         cd $GITHUB_WORKSPACE/kernel_workspace
+         if [ -f android-kernel/out/arch/amr64/boot/${{ env.KERNEL_FILE }} ]; then
+             echo "CHECK_FILE_IS_OK=true" >> $GITHUB_ENV
+         else
+             echo "Kernel output file is empty"
+         fi
+
+      - name: Make Anykernel3
+        if: env.CHECK_FILE_IS_OK == 'true'
+        run: |
+          cd $GITHUB_WORKSPACE/kernel_workspace
+          git clone https://github.com/osm0sis/AnyKernel3
+          cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} anykernel/
+          rm -rf anykernel/anykernel.sh
+          cp $GITHUB_WORKSPACE/anykernel.sh anykernel/
+          rm -rf anykernel/.git* anykernel/README.md
+
+      - name: Upload AnyKernel3
+        if: env.CHECK_FILE_IS_OK == 'true'
+        uses: actions/upload-artifact@v3
         with:
-          automatic_release_tag: "${{env.KERNEL_NAME}}-${{env.BUILD_TIME}}"
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            kernel_workspace/android-kernel/out/*.zip
+          name: ${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+          path: kernel_workspace/anykernel/*
 
