@@ -66,8 +66,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
           mkdir clang-aosp
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r416183c.tar.gz
-          tar -C clang-aosp/ -zxvf clang-r416183b.tar.gz
+          curl -O https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r416183c.tar.gz
+          tar -C clang-aosp/ -zxvf clang-r416183c.tar.gz
 
       - name: Download Gcc-aosp
         # if: env.USE_CUSTOM_GCC_64 != 'true' || env.USE_CUSTOM_GCC_32 != 'true'
