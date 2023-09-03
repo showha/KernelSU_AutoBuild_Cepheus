@@ -1,4 +1,4 @@
-name: crDroid_build_kernel
+ name: crDroid_build_kernel
 
 env:
   KERNEL_SOURCE:  'https://github.com/raystef66/android_kernel_xiaomi_cepheus'
@@ -37,8 +37,8 @@ jobs:
           echo "delete yaml scrpit"
           rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
           cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
-          echo "CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_GZIP=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          echo "CONFIG_FB_CFB_IMAGEBLIT=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_DEFCONFIG }}
+          echo "CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_GZIP=y" >> $GITHUB_WORKSPACE/kernel_workspace/android-kernel/arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+          echo "CONFIG_FB_CFB_IMAGEBLIT=y" >> $GITHUB_WORKSPACE/kernel_workspace/android-kernel/arch/${{ env.ARCH }}/configs/${{ env.KERNEL_DEFCONFIG }}
           
       - name: Startup KernelSU
         run: |
