@@ -142,7 +142,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: ${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+          automatic_release_tag: "${{env.KERNEL_NAME}}-${{env.BUILD_TIME}}"
           files: |
             $KERNEL_PATH/out/$KERNEL_NAME.zip
 
