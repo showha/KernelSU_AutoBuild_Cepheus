@@ -1,4 +1,4 @@
- name: crDroid_build_kernel
+name: crDroid_build_kernel
 
 env:
   KERNEL_SOURCE:  'https://github.com/raystef66/android_kernel_xiaomi_cepheus'
