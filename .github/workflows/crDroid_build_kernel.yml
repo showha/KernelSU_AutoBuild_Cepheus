@@ -1,10 +1,8 @@
 name: crDroid_build_kernel
 
 env:
-  # KERNEL_SOURCE: 'https://github.com/crdroidandroid/android_kernel_xiaomi_cepheus'
   KERNEL_SOURCE:  'https://github.com/raystef66/android_kernel_xiaomi_cepheus'
   KERNEL_SOURCE_BRANCH:  '12.1-cepheus'
-  # KERNEL_SOURCE_BRANCH: '13.0'
   KERNEL_CONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'crDroid-cepheus'
   ARCH:  'arm64'
@@ -19,34 +17,76 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download kernel source
+      - name: Setup the evironment
         run: |
-          mkdir -p $GITHUB_WORKSPACE/kernel_workspace && cd $GITHUB_WORKSPACE/kernel_workspace
-          git clone https://github.com/raystef66/android_kernel_xiaomi_cepheus -b 12.1-cepheus android-kernel --depth=1
-          rm -f $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
-          cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/
-          sed -i '/supported.versions.*/d' $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh
-          sed -i '/do.devicecheck.*/d' $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh
+          echo "kernel source : ${{env.KERNEL_SOURCE}}"
+          echo "kernel source bach : ${{env.KERNEL_SOURCE_BRANCH}}"
+          echo "kernel defconfig : ${{env.KERNEL_DEFCONFIG}}"
+          echo "kernel name : ${{env.KERNEL_NAME}}"
+          sudo apt-get update
+          sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3
+      - name: Download Kernel Source
+        run: |
+          echo "download kernel source"
+          cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
+          git clone ${{env.KERNEL_SOURCE}} -b ${{env.KERNEL_SOURCE_BRANCH}} android-kernel --depth=1
 
-      - name: Setup KernelSU
+      - name: Fix the Kernel Source
         run: |
+          echo "delete yaml scrpit"
+          rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
+          cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
+          
+      - name: Startup KernelSU
+        run: |
+          echo "add kernelsu"
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
-          echo "UPLOADNAME=-KernelSU" >> $GITHUB_ENV
+          echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{env.KERNEL_DEFCONFIG}}
+          echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{env.KERNEL_DEFCONFIG}}
+          echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{env.KERNEL_DEFCONFIG}}
+          
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+          
+      - name: Build Kernel
+        run: |
+          echo change build config
+          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          rm .git -R
+          sed -i '/supported.versions.*/d' anykernel.sh
+          sed -i '/do.devicecheck.*/d' anykernel.sh
+          
+          sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${KERNEL_NAME}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
 
-      - name: Setup Configuration for Kernel
-        run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          echo "CONFIG_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          echo "CONFIG_HAVE_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-          echo "CONFIG_KPROBE_EVENTS=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
-      
-      - name: do build
-        run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           sudo bash build.sh
-          # make O=out clean mrproper CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ ${KERNEL_DEFCONFIG}
-          # make O=out CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ -j$(nproc --all)
+
+      # - name: Download kernel source
+      #   run: |
+      #     mkdir -p $GITHUB_WORKSPACE/kernel_workspace && cd $GITHUB_WORKSPACE/kernel_workspace
+      #     git clone https://github.com/raystef66/android_kernel_xiaomi_cepheus -b 12.1-cepheus android-kernel --depth=1
+      #     rm -f $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
+      #     cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/
+      #     sed -i '/supported.versions.*/d' $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh
+      #     sed -i '/do.devicecheck.*/d' $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh
+
+      # - name: Setup KernelSU
+      #   run: |
+      #     cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+      #     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s
+      #     echo "UPLOADNAME=-KernelSU" >> $GITHUB_ENV
+
+      # - name: Setup Configuration for Kernel
+      #   run: |
+      #     cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+      #     echo "CONFIG_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+      #     echo "CONFIG_HAVE_KPROBES=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+      #     echo "CONFIG_KPROBE_EVENTS=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+      
+      # - name: do build
+      #   run: |
+      #     cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+      #     sudo bash build.sh
+      #     # make O=out clean mrproper CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ ${KERNEL_DEFCONFIG}
+      #     # make O=out CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf OBJSIZE=llvm-size STRIP=llvm-strip HOSTCC=clang HOSTCXX=clang++ -j$(nproc --all)
 
       - name: release
         uses: "marvinpinto/action-automatic-releases@latest"
