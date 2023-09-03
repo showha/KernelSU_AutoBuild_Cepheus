@@ -1,8 +1,10 @@
 name: crDroid_build_kernel
 
 env:
-  KERNEL_SOURCE: 'https://github.com/crdroidandroid/android_kernel_xiaomi_cepheus'
-  KERNEL_SOURCE_BRANCH: '13.0'
+  # KERNEL_SOURCE: 'https://github.com/crdroidandroid/android_kernel_xiaomi_cepheus'
+  KERNEL_SOURCE:  'https://github.com/raystef66/android_kernel_xiaomi_cepheus'
+  KERNEL_SOURCE_BRANCH:  '12.1-cepheus'
+  # KERNEL_SOURCE_BRANCH: '13.0'
   KERNEL_DEFCONFIG: 'cepheus_defconfig'
   KERNEL_NAME: 'crDroid-cepheus'
   
@@ -23,6 +25,7 @@ jobs:
       
       - name: do build
         run: |
+          sed -i 
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           sudo bash build.sh   
           
