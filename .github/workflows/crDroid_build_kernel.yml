@@ -23,8 +23,8 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/kernel_workspace && cd $GITHUB_WORKSPACE/kernel_workspace
           git clone https://github.com/raystef66/android_kernel_xiaomi_cepheus -b 12.1-cepheus android-kernel --depth=1
-          rm $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
-          cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc
+          rm -f $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/yamltree.c
+          cp $GITHUB_WORKSPACE/patch/EcrosoftXiao_kernel/scripts/dtc/* $GITHUB_WORKSPACE/kernel_workspace/android-kernel/scripts/dtc/
           sed -i '/supported.versions.*/d' anykernel.sh
           sed -i '/do.devicecheck.*/d' anykernel.sh
 
