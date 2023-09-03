@@ -128,7 +128,7 @@ jobs:
           git clone https://github.com/osm0sis/AnyKernel3
           cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} anykernel/
           rm -rf anykernel/anykernel.sh
-          cp $GITHUB_WORKSPACE/anykernel.sh anykernel/
+          cp $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh anykernel/
           rm -rf anykernel/.git* anykernel/README.md
 
       - name: Upload AnyKernel3
