@@ -127,11 +127,10 @@ jobs:
         # if: env.CHECK_FILE_IS_OK == 'true'
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace
-          git clone https://github.com/osm0sis/AnyKernel3 Anykernel
           cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} Anykernel/
-          rm -rf anykernel/anykernel.sh
+          rm -rf Anykernel/anykernel.sh
           cp $GITHUB_WORKSPACE/kernel_workspace/android-kernel/anykernel.sh Anykernel/
-          rm -rf anykernel/.git* anykernel/README.md
+          rm -rf Anykernel/.git* Anykernel/README.md
 
       - name: Upload AnyKernel3
         if: env.CHECK_FILE_IS_OK == 'true'
