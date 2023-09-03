@@ -95,7 +95,7 @@ jobs:
           # fi
       - name: Download kernel source
         run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace
+          mkdir -p $GITHUB_WORKSPACE/kernel_workspace && cd $GITHUB_WORKSPACE/kernel_workspace
           git clone https://github.com/raystef66/android_kernel_xiaomi_cepheus -b 12.1-cepheus android-kernel --depth=1
 
       - name: Setup KernelSU
