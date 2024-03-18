@@ -162,7 +162,7 @@ fi
 echo "=========================Patch========================="
 rm -r $ANYKERNEL_PATH/modules $ANYKERNEL_PATH/patch $ANYKERNEL_PATH/ramdisk
 rm -f $ANYKERNEL_PATH/anykernel.sh
-cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/anykernel.sh $ANYKERNEL_PATH/
+cp $KERNEL_PATH/anykernel.sh $ANYKERNEL_PATH/
 cp $KERNEL_PATH/out/arch/arm64/boot/Image.gz-dtb $ANYKERNEL_PATH/
 cd $ANYKERNEL_PATH
 zip -r $KERNEL_NAME *
