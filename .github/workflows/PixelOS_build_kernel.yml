@@ -36,12 +36,12 @@ jobs:
           # echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
           # echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
           # echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-          # rm -rf drivers/staging/kernelsu
-          # sed -i '/kernelsu/d' drivers/staging/Kconfig
-          # sed -i '/kernelsu/d' drivers/staging/Makefile
+          rm -rf drivers/staging/kernelsu
+          sed -i '/kernelsu/d' drivers/staging/Kconfig
+          sed -i '/kernelsu/d' drivers/staging/Makefile
 
-          # curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-          sudo bash ksu_update.sh
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+          # sudo bash ksu_update.sh
           
       - name: build kernel
         run: |
