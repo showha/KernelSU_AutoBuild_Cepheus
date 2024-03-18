@@ -130,7 +130,7 @@ export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 export CLANG_PREBUILT_BIN=${CLANG_PATH}/bin
 export CC="ccache clang"
 export CXX="ccache clang++"
-export LD=ld.lld
+export LD=${CLANG_PATH}/bin/ld.lld
 export LLVM=1
 export LLVM_IAS=1
 export ARCH=arm64
@@ -148,8 +148,8 @@ rm -rf $KERNEL_PATH/out/ *.zip
 make mrproper
 
 echo "=========================Build========================="
-make O=out LLVM_IAS=1 cepheus_defconfig
-make O=out LLVM_IAS=1 -j$(grep -c ^processor /proc/cpuinfo)
+make O=out LLVM_IAS=1 LD=${LD} cepheus_defconfig
+make O=out LLVM_IAS=1 LD=${LD} -j$(grep -c ^processor /proc/cpuinfo)
 
 if [ ! -e $KERNEL_PATH/out/arch/arm64/boot/Image.gz-dtb ]; then
     echo "=======================FAILED!!!======================="
