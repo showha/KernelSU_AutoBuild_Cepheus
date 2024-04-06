@@ -1,4 +1,4 @@
-name: PixelOS_build_kernel
+name: PixelOS_Apatch_build_kernel
 env:
   KERNEL_SOURCE: 'https://github.com/balgxmr/kernel_xiaomi_cepheus'
   KERNEL_SOURCE_BRANCH: 'ksu-new'
