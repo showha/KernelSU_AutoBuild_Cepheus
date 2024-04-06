@@ -37,9 +37,8 @@ jobs:
           # echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
           # echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
           rm -rf drivers/staging/kernelsu
-          sed -i '/CONFIG_KSU=/ s|y|n|' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-          sed -i '/CONFIG_KALLSYMS=/ s|n|y|' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-          sed -i '/CONFIG_KALLSYMS_ALL=/ s|n|y|' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
+          sed -i '/CONFIG_KSU=/ s|y|n|p' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
+          echo "CONFIG_KALLSYMS_ALL=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
           sed -i '/kernelsu/d' drivers/staging/Kconfig
           sed -i '/kernelsu/d' drivers/staging/Makefile
 
