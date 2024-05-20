@@ -150,7 +150,9 @@ make mrproper
 echo "=========================Build========================="
 make O=out LLVM_IAS=1 LD=${LD} cepheus_defconfig
 rm -f out/.config
-cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/.config out/
+cp $KERNEL_PATH/replace_zh/.config out/
+ls $KERNEL_PATH/replace_zh/
+ls out/
 make O=out LLVM_IAS=1 LD=${LD} -j$(grep -c ^processor /proc/cpuinfo)
 
 if [ ! -e $KERNEL_PATH/out/arch/arm64/boot/Image.gz-dtb ]; then
