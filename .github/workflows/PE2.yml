@@ -26,7 +26,7 @@ jobs:
         run: |
           
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/anykernel.sh $GITHUB_WORKSPACE/patch/pixelOS_kernel/build.sh $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/anykernel.sh $GITHUB_WORKSPACE/patch/pixelOS_kernel/build_apatch.sh $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${KERNEL_NAME}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
           
           
@@ -55,7 +55,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
           rm .git -R
-          sudo bash build.sh
+          sudo bash build_apatch.sh
           echo "BUILD_TIME=$(TZ=Asia/Shanghai date "+%Y%m%d%H%M%S")" >> $GITHUB_ENV
           
       - name: release
