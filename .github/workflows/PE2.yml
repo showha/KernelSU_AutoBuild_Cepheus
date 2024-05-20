@@ -26,7 +26,10 @@ jobs:
         run: |
           
           cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/anykernel.sh $GITHUB_WORKSPACE/patch/pixelOS_kernel/build_apatch.sh $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          mkdir replace_zh
+          cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/anykernel.sh $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/build_apatch.sh $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+          cp $GITHUB_WORKSPACE/patch/pixelOS_kernel/.config $GITHUB_WORKSPACE/kernel_workspace/android-kernel/replace_zh
           sed -i "s/KERNEL_NAME=.*/KERNEL_NAME=${KERNEL_NAME}-"$(date "+%Y%m%d%H%M%S")"/g" build.sh
           
           
